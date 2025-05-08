@@ -13,9 +13,11 @@
 </head>
 
 <body class="bg-gradient-to-br from-blue-200 to-indigo-300 min-h-screen">
+
+    <!-- Navigation bar -->
     <nav class="sm:m-4 m-2 bg-white shadow-md sm:p-5 p-2 flex justify-between items-center">
         <h1 class="sm:text-3xl text-2xl font-bold text-blue-700">WeatherNow</h1>
-        <div class="sm:space-x-8 xs:space-x-4 space-x-2">
+        <div class="sm:space-x-8 space-x-2">
             <a href="index.html" class="text-blue-700 hover:underline font-bold sm:text-xl">Home</a>
             <a href="weather.html" class="text-blue-700 hover:underline font-bold sm:text-xl">Weather</a>
             <a href="https://github.com/ArjunLakshakar?tab=repositories" target="_blank"
@@ -25,6 +27,7 @@
         </div>
     </nav>
 
+    <!-- Header section  -->
     <header class="text-center m-6 flex justify-center items-center gap-4">
         <h1 class="sm:text-5xl text-4xl font-bold text-white">
             <span class="text-blue-600">Weather</span> Dashboard
@@ -35,6 +38,8 @@
     <div class="flex flex-col sm:flex-row gap-4 mt-6 sm:m-4 m-2">
         <div class="sm:w-2/3">
             <div class="max-w-4xl mx-auto">
+
+                <!-- Search Bar and Curr Location -->
                 <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
                     <div class="flex flex-1 gap-2">
                         <input id="cityInput" type="text" placeholder="Enter city name"
@@ -54,6 +59,10 @@
                     </div>
                 </div>
 
+                <!-- Error Message -->
+                <p id="error" class="text-red-600 mb-4 text-center hidden"></p>
+
+                <!-- Recent search -->
                 <div id="recentCitiesContainer" class="mb-4 hidden mt-4">
                     <label class="text-white mb-2 block">Recently Searched:</label>
                     <select id="recentCities" class="w-full rounded-xl px-3 py-2" onchange="selectRecentCity(this)">
@@ -61,8 +70,9 @@
                     </select>
                 </div>
 
+                <!-- Weather Information -->
                 <div class="bg-white sm:p-6 p-4 rounded-xl shadow-md mb-6">
-                    <div class="flex items-center justify-around">
+                    <div class="flex items-center sm:justify-around justify-between gap-2">
                         <div>
                             <h2 id="cityName" class="md:text-xl text-md font-bold mb-1"></h2>
                             <p id="date" class="text-gray-600 mb-2"></p>
@@ -70,23 +80,26 @@
 
                         <div class="flex flex-col items-center">
                             <p id="temperature" class="md:text-4xl text-3xl font-bold text-blue-600"></p>
-                            <p class="md:text-xl text:md text-blue-600">Temperature</p>
+                            <p class="md:text-xl text-md text-blue-600">Temperature</p>
                         </div>
 
                         <div class="flex flex-col items-center text-center">
-                            <i id="weatherIcon" class="wi md:text-xl text-lg  text-blue-600"></i>
+                            <i id="weatherIcon" class="wi md:text-xl text-lg text-blue-600"></i>
                             <p id="description" class="capitalize"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white md:p-6 p-4  rounded-xl shadow-md mb-6">
+                <!-- Upcoming Hours -->
+                <div class="bg-white md:p-6 p-4 rounded-xl shadow-md mb-6">
                     <h3 class="text-lg font-semibold mb-4">Upcoming Hours</h3>
                     <div id="hourlyForecast"
-                        class="grid grid-cols-3 sm:grid-cols-6 md:gap-4 sm:gap-2 gap-4 text-center">
+                        class="grid grid-cols-3 sm:grid-cols-6 md:gap-4 sm:gap-2 gap-4 text-center ">
                     </div>
                 </div>
 
+
+                <!-- Current Weather Details -->
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-xl shadow text-center">
                         <p>Humidity</p>
@@ -100,7 +113,7 @@
                         <p>Precipitation</p>
                         <p id="precipitation" class="sm:text-xl text-lg font-bold"></p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow text-center ">
+                    <div class="bg-white p-4 rounded-xl shadow text-center">
                         <p>UV Index</p>
                         <p id="uvIndex" class="sm:text-xl text-lg font-bold"></p>
                     </div>
@@ -113,11 +126,10 @@
                         <p id="rainChance" class="sm:text-xl text-lg font-bold"></p>
                     </div>
                 </div>
-
-                <p id="error" class="text-red-600 mt-4 hidden text-center"></p>
             </div>
         </div>
 
+        <!-- 5-Day Forecast -->
         <div class="sm:w-1/3">
             <div class="bg-white lg:p-6 sm:p-2 p-6 rounded-xl shadow-md">
                 <h3 class="text-lg font-semibold mb-4">5-Day Forecast</h3>
@@ -126,15 +138,14 @@
         </div>
     </div>
 
-    <div class=" bottom-0 left-0 lg:-mt-20 ">
-        <img src="src/img/people-walking.png" alt="People walking" class="w-56 sm:w-56 lg:w-64 " />
+    <div class="bottom-0 left-0 lg:-mt-20">
+        <img src="src/img/people-walking.png" alt="People walking" class="w-56 sm:w-56 lg:w-64" />
     </div>
 
-    <footer class="bg-white text-center p-4 shadow-inner">
+    <!-- Footer -->
+    <footer class="bg-white text-center p-4">
         <p class="text-gray-600">&copy; 2025 <span class="text-blue-500">WeatherNow</span>. All rights reserved.</p>
     </footer>
-
-
 </body>
 
 </html>

@@ -1,14 +1,18 @@
+// OpenWeatherMap API key
 const API_KEY = '0e1f7753bc8a3809f7b3533b745a85fb';
 
+// When the window loads
 window.onload = () => {
-    updateRecentCities();
+    updateRecentCities(); // Show recent cities from localStorage
     if (navigator.geolocation) {
+        // If geolocation is available, get user's current position
         navigator.geolocation.getCurrentPosition(pos => {
             fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
         });
     }
 };
 
+// Map OpenWeatherMap icon codes to Weather Icons classes
 function getWeatherIconClass(code) {
     const map = {
         "01d": "wi-day-sunny",
@@ -33,25 +37,30 @@ function getWeatherIconClass(code) {
     return map[code] || "wi-na";
 }
 
+// Load and show recent cities from localStorage
 function updateRecentCities() {
     const container = document.getElementById('recentCitiesContainer');
     const select = document.getElementById('recentCities');
     const recent = JSON.parse(localStorage.getItem('recentCities')) || [];
+
     if (recent.length) {
         container.classList.remove('hidden');
-        select.innerHTML = '<option value="">Select a city</option>' + recent.map(city => `<option value="${city}">${city}</option>`).join('');
+        select.innerHTML = '<option value="">Select a city</option>' +
+            recent.map(city => `<option value="${city}">${city}</option>`).join('');
     } else {
         container.classList.add('hidden');
     }
 }
 
+// Triggered when user selects a recent city
 function selectRecentCity(select) {
     if (select.value) {
         document.getElementById('cityInput').value = select.value;
-        getWeather();
+        getWeather(); // Load weather for that city
     }
 }
 
+// Save a new recent city to localStorage
 function saveRecentCity(city) {
     let recent = JSON.parse(localStorage.getItem('recentCities')) || [];
     if (!recent.includes(city)) {
@@ -62,13 +71,15 @@ function saveRecentCity(city) {
     }
 }
 
+// Fetch current weather using geographic coordinates
 async function fetchWeatherByCoords(lat, lon) {
     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
     const data = await res.json();
     document.getElementById('cityInput').value = data.name;
-    getWeather();
+    getWeather(); // Load weather for that location
 }
 
+// Button handler to use current location
 function useCurrentLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -81,17 +92,21 @@ function useCurrentLocation() {
     }
 }
 
+// Fetch and display current and forecast weather for a city
 async function getWeather() {
     const city = document.getElementById('cityInput').value.trim();
     const errorElem = document.getElementById('error');
+
     if (!city) {
         errorElem.textContent = 'Please enter a valid city name.';
         errorElem.classList.remove('hidden');
         return;
     }
+
     errorElem.classList.add('hidden');
 
     try {
+        // Fetch current weather and 5-day forecast in parallel
         const [weatherRes, forecastRes] = await Promise.all([
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`),
             fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`)
@@ -100,8 +115,14 @@ async function getWeather() {
         const weather = await weatherRes.json();
         const forecast = await forecastRes.json();
 
-        saveRecentCity(city);
+        // Check if city is not found
+        if (weather.cod !== 200 || forecast.cod !== "200") {
+            throw new Error(weather.message || "City not found.");
+        }
 
+        saveRecentCity(city); // Save to recent cities list
+
+        // Populate UI with current weather data
         document.getElementById('cityName').textContent = weather.name + ', ' + weather.sys.country;
         document.getElementById('date').textContent = new Date().toLocaleDateString();
         document.getElementById('description').textContent = weather.weather[0].description;
@@ -110,6 +131,7 @@ async function getWeather() {
         document.getElementById('wind').textContent = `${weather.wind.speed} km/h`;
         document.getElementById('feelsLike').textContent = `${weather.main.feels_like.toFixed(1)}°`;
 
+        // Set weather icon
         const iconClass = getWeatherIconClass(weather.weather[0].icon);
         const iconElem = document.getElementById('weatherIcon');
         iconElem.className = `wi ${iconClass} text-5xl text-blue-600`;
@@ -118,6 +140,7 @@ async function getWeather() {
         document.getElementById('uvIndex').textContent = Math.floor(Math.random() * 11);
         document.getElementById('rainChance').textContent = `${Math.floor(Math.random() * 100)}%`;
 
+        // Display next 6 hourly forecasts
         const now = new Date();
         const hourlyContainer = document.getElementById('hourlyForecast');
         hourlyContainer.innerHTML = '';
@@ -131,41 +154,42 @@ async function getWeather() {
                 const temp = `${item.main.temp.toFixed(0)}°`;
 
                 hourlyContainer.innerHTML += `
-                            <div class="bg-blue-100 rounded-xl p-3">
-                                <p class="font-semibold">${hour}</p>
-                                <p>${temp}</p>
-                            </div>
-                        `;
+                    <div class="bg-blue-100 rounded-xl p-3">
+                        <p class="font-semibold">${hour}</p>
+                        <p>${temp}</p>
+                    </div>
+                `;
                 added++;
             }
         }
 
+        // Display 5-day forecast (only the noon data points)
         const daily = forecast.list.filter(item => item.dt_txt.includes('12:00:00'));
         const forecastCards = document.getElementById('forecastCards');
         forecastCards.innerHTML = '';
+
         daily.forEach(day => {
             const icon = getWeatherIconClass(day.weather[0].icon);
             forecastCards.innerHTML += `
-                        <div class="bg-blue-100 rounded-xl p-4 text-center space-y-2">
-                            <h4 class="font-semibold">${new Date(day.dt_txt).toLocaleDateString()}</h4>
-                            <div class="flex items-center gap-2 justify-around"> 
-                                <div class="flex flex-col gap-2 items-center "> 
-                                    <i class="wi ${icon} lg:text-4xl text-3xl text-blue-600"></i>
-                                    <p class="capitalize lg:text-md md:text-sm sm:text-xs ">${day.weather[0].description}</p>
-                                </div>
-                                <div class="lg:text-md md:text-sm sm:text-xs   text-gray-700">
-                                    <p>Temp: ${day.main.temp.toFixed(1)}°</p>
-                                    <p>Humidity: ${day.main.humidity}%</p>
-                                    <p>Wind: ${day.wind.speed} km/h</p>
-                                </div>
-                            </div>
-                            
+                <div class="bg-blue-100 rounded-xl p-4 text-center space-y-2">
+                    <h4 class="font-semibold">${new Date(day.dt_txt).toLocaleDateString()}</h4>
+                    <div class="flex items-center gap-2 justify-around"> 
+                        <div class="flex flex-col gap-2 items-center "> 
+                            <i class="wi ${icon} lg:text-4xl text-3xl text-blue-600"></i>
+                            <p class="capitalize lg:text-md md:text-sm sm:text-xs ">${day.weather[0].description}</p>
                         </div>
-                    `;
+                        <div class="lg:text-md md:text-sm sm:text-xs text-gray-700">
+                            <p>Temp: ${day.main.temp.toFixed(1)}°</p>
+                            <p>Humidity: ${day.main.humidity}%</p>
+                            <p>Wind: ${day.wind.speed} km/h</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         });
 
     } catch (err) {
-        errorElem.textContent = err.message;
+        errorElem.textContent = err.message; // Display any errors to user
         errorElem.classList.remove('hidden');
     }
 }
